@@ -1,11 +1,20 @@
 import java.util.Arrays;
 
 public class PriorityQueue<T extends Comparable<? super T>> {
-
+    
+    // set default capacity
     private static final int DEFAULT_CAPACITY = 10;
+    
+    // generic array representation of binary heap
+    // forms the bases for the priority queue
     private T[] heap;
+
     private int size;
     private int capacity;
+    
+    /***************************************
+    *            Constructors              
+    ***************************************/
     
     public PriorityQueue() {
         this(DEFAULT_CAPACITY);
@@ -17,22 +26,27 @@ public class PriorityQueue<T extends Comparable<? super T>> {
         capacity = initCapacity;
     }
     
+    /****************************************
+    *           public methods 
+    ****************************************/           
+
     public void insert(T newElement) {
-        if (size == capacity)
+        if (size == capacity) // heap is full
             increaseCapacity();
         heapifyUp(size, newElement);
         size++;
     }
     
+    // returns the highest priority element or null if empty
     public T findMin() {
         return heap[0];
     }
     
     public void delete(int deleteIndex) {
         if (deleteIndex < 0 || deleteIndex > size-1)
-            System.out.println("illegal index");
+            System.out.println("index out of bounds");
         else {
-            T freeElement = heap[--size];
+            T freeElement = heap[--size]; 
             heap[size] = null;
             if (deleteIndex != size)
                 heapifyDown(deleteIndex, freeElement);
@@ -40,7 +54,7 @@ public class PriorityQueue<T extends Comparable<? super T>> {
     }
     
     public T extractMin() {
-        T priorityElement = heap[0];
+        T priorityElement = findMin();
         if (priorityElement != null) {
             delete(0);
         }
@@ -55,23 +69,30 @@ public class PriorityQueue<T extends Comparable<? super T>> {
         return capacity;
     }
 
+    /*****************************************
+    *         Private Utility Methods
+    *****************************************/ 
+
+    // utility method to insert new element while maintaining heap invariant
     private void heapifyUp(int index, T key) {
-        while (index > 0) {
+        while (index > 0) { // there exists a parent of element at index
             int parentIndex = (index-1) / 2;
             T parent = heap[parentIndex];
             if (key.compareTo(parent) >= 0)
-                break;
+                break; 
             heap[index] = parent;
             index = parentIndex;
         }
         heap[index] = key;
     }
     
+    // utility method to restore heap invariant after a deletion at index
     private void heapifyDown(int index, T key) {
-        while (index < size/2) {
+        while (index < size/2) { // there exists a child of element at index
             int childIndex = 2*index + 1;
             T child = heap[childIndex];
             int rightIndex = childIndex + 1;
+            // id the priority child
             if (rightIndex < size && child.compareTo((T) heap[rightIndex]) > 0) {
                 childIndex = rightIndex;
                 child = heap[rightIndex];
@@ -100,6 +121,7 @@ public class PriorityQueue<T extends Comparable<? super T>> {
         }
     }
     
+    // test function of priority queue
     public static void main(String[] args) {
         PriorityQueue<Integer> q = new PriorityQueue<>();
         q.print();
