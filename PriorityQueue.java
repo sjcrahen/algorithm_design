@@ -105,6 +105,11 @@ public class PriorityQueue<T extends Comparable<? super T>> {
         heap[index] = key;
     }
 
+    private void heapify() {
+        for (int i = size/2 - 1; i >= 0; i--)
+            heapifyDown(i, heap[i]);
+    }
+
     private void increaseCapacity() {
         heap = Arrays.copyOf(heap, capacity+10);
         capacity += 10;
