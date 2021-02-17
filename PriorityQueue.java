@@ -69,6 +69,22 @@ public class PriorityQueue<T extends Comparable<? super T>> {
         return capacity;
     }
 
+    public void heapify() {
+        for (int i = size/2 - 1; i >= 0; i--)
+            heapifyDown(i, heap[i]);
+    }
+    
+    public void print() {
+        if (size == 0)
+            System.out.println("empty queue");
+        else {
+            System.out.print("queue is: ");
+            for (int i = 0; i < capacity; i++)
+                System.out.print(heap[i] + " ");
+            System.out.println();
+        }
+    }
+
     /*****************************************
     *         Private Utility Methods
     *****************************************/ 
@@ -105,25 +121,9 @@ public class PriorityQueue<T extends Comparable<? super T>> {
         heap[index] = key;
     }
 
-    private void heapify() {
-        for (int i = size/2 - 1; i >= 0; i--)
-            heapifyDown(i, heap[i]);
-    }
-
     private void increaseCapacity() {
         heap = Arrays.copyOf(heap, capacity+10);
         capacity += 10;
-    }
-    
-    private void print() {
-        if (size == 0)
-            System.out.println("empty queue");
-        else {
-            System.out.print("queue is: ");
-            for (int i = 0; i < capacity; i++)
-                System.out.print(heap[i] + " ");
-            System.out.println();
-        }
     }
     
     // test function of priority queue
