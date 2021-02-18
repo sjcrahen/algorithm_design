@@ -2,10 +2,11 @@ import java.util.*;
 
 public class ShortestPathDemo {
 
-    public static Node[] node; // array of nodes
-    public static Set<Node> S; // set of explored nodes
-    public static PriorityQueue<Node> pq; // priority queue of all nodes; supports O(log n) extractMin() operation
+    public static Node[] node; // array of nodes; supports O(1) access to Node objects
+    public static Set<Node> S; // set of explored nodes; supports O(1) add() and contains()
+    public static PriorityQueue<Node> pq; // priority queue of all nodes; supports O(log n) insert() and extractMin() 
     public static List<List<Edge>> adj; // adjacency list representation of the graph
+    public static boolean pathExists = true; // flag non-existent paths
     
     public static void main(String[] args) {
         
@@ -23,7 +24,7 @@ public class ShortestPathDemo {
             adj.add(new LinkedList<Edge>());
         }
         
-        // add edges to adj
+        // add edges to adjacency list
         adj.get(0).add(new Edge(node[1], 9));
         adj.get(0).add(new Edge(node[5], 14));
         adj.get(0).add(new Edge(node[6], 15));
@@ -40,33 +41,35 @@ public class ShortestPathDemo {
         adj.get(6).add(new Edge(node[4], 20));
         adj.get(6).add(new Edge(node[7], 44));
         
-//        for (int i = 0; i < numberOfNodes; i++) {
-//            System.out.println("edges from node " + i);
-//            for (Edge e : adj.get(i))
-//                System.out.print(e.inNode + " ");
-//            System.out.println();
-//        }
-        
         /////////////////////////////////////////////////////////////
         //      
         // implement Dijkstra's algorithm
         //
         /////////////////////////////////////////////////////////////
         
+        int startNodeNumber = 0;
+        int endNodeNumber = 7;
+        
         // initially S = {s} and s.key = 0
-        Node s = pq.extractMin();
+        pq.delete(startNodeNumber);
+        Node s = node[startNodeNumber];
         S.add(s);
         s.setKey(0);
 
         Node u = s, v;
         while (S.size() < numberOfNodes) {
-            // select the node not yet in S with at least one edge from S
-            // which has the shortest distance
-            for (Edge e : adj.get(u.getNodeNumber())) {
+            List<Edge> edges = adj.get(u.getNodeNumber());
+
+            // explore and update keys of adjacent nodes not already explored
+            for (Edge e : edges) {
                 v = e.getInNode();
+                if (S.contains(v)) // Node v already explored
+                    continue;
                 changeKey(u, v, e); // update distance
             }
             pq.heapify(); // reheap after changeKey()
+            
+            // add v with lowest key to S; v is at index 0 of pq
             v = pq.extractMin();
             S.add(v); // add next node to set S
             u = v;
@@ -77,31 +80,43 @@ public class ShortestPathDemo {
         // end algorithm
         //
         ////////////////////////////////////////////////////////////
-        
-        // display distances of shortest path from starting node to each node
-        for (int i = 0; i < numberOfNodes; i++) {
-            System.out.println("shortest path to node " + node[i].getNodeNumber()
-                    + " is length " + node[i].getKey() + " ");
-        }
-        
-        // display shortest path from node 0 to node 7
-        Node startNode = node[0];
-        Node finishNode = node[7];
-        Stack<Node> shortestPath = new Stack<>();
-        shortestPath.push(finishNode);
 
-        Node current = finishNode, parent = current;
-        while (parent != startNode) {
+        // assemble list of Nodes on shortest path
+        Node startNode = node[startNodeNumber];
+        Node endNode = node[endNodeNumber];
+        Stack<Node> shortestPath = new Stack<>();
+        shortestPath.push(endNode);
+
+        Node current = endNode, parent;
+        while (current.getParent() != null) {
             parent = current.getParent();
             shortestPath.push(parent);
             current = parent;
         }
-        System.out.println("\nshortest path from node " + startNode.getNodeNumber()
-                + " to node " + finishNode.getNodeNumber() + " is:");
-        System.out.print("[ ");
-        while (!shortestPath.isEmpty())
-            System.out.print(shortestPath.pop().getNodeNumber() + " ");
-        System.out.println("]");
+        if (current != startNode) // there was no path from startNode to endNode
+            pathExists = false;
+
+        // display distances of shortest path from starting node to each node
+        for (int i = 0; i < numberOfNodes; i++) {
+            if (Math.abs(node[i].getKey()) < 2000000000) // a path exists
+                System.out.println("shortest path from node " + startNodeNumber
+                        + " to node " + i + " is length " + node[i].getKey() + " ");
+            else
+                System.out.println("no path exists from node " + startNodeNumber
+                        + " to node " + i);
+        }
+        
+        // display shortest path from startNode to endNode if path exists
+        if (pathExists) {
+            System.out.println("\nshortest path from node " + startNodeNumber
+                    + " to node " + endNodeNumber + " is:");
+            System.out.print("[ ");
+            while (!shortestPath.isEmpty())
+                System.out.print(shortestPath.pop().getNodeNumber() + " ");
+            System.out.println("]");
+        } else
+            System.out.println("\nno path exists from node " + startNodeNumber
+                    + " to node " + endNodeNumber);
     }
     
     private static void changeKey(Node outNode, Node inNode, Edge e) {
