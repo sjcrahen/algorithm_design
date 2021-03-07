@@ -15,7 +15,7 @@ import java.util.Stack;
 public class Graph<T extends Comparable<? super T>> {
     
     public static void main(String[] args) {
-        Graph<Integer> g = new Graph<>();
+        Graph<Integer> g = new Graph<>(true);
 
         g.addEdge(0, 1, 9);
         g.addEdge(0, 5, 14);
@@ -64,7 +64,7 @@ public class Graph<T extends Comparable<? super T>> {
         if (!graph.containsKey(v)) graph.put(v, new Vertex(v));
         
         graph.get(u).edges.put(v, weight);
-        if (isDigraph)
+        if (!isDigraph)
             graph.get(v).edges.put(u, weight);
     }
     
@@ -184,7 +184,7 @@ public class Graph<T extends Comparable<? super T>> {
 
     // Prim's algorithm to find the minimum spanning tree
     public Graph<T> getMinimumSpanningTree(T root) {
-        Graph<T> mst = new Graph<>();
+        Graph<T> mst = new Graph<>(true);
         Set<Vertex> explored = new HashSet<>();
         Queue<Vertex> pq = new PriorityQueue<>((u, v) -> ((Double) u.cost).compareTo(v.cost));
         Vertex u = graph.get(root);
