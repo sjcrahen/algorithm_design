@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class PriorityQueue<T extends Comparable<? super T>> {
     
@@ -9,6 +10,9 @@ public class PriorityQueue<T extends Comparable<? super T>> {
     // forms the bases for the priority queue
     private T[] heap;
 
+    // mapping objects T in the heap to their index for O(1) access to index
+    private HashMap<T, Integer> indexMap;
+    
     private int size;
     private int capacity;
     
@@ -24,6 +28,7 @@ public class PriorityQueue<T extends Comparable<? super T>> {
     public PriorityQueue(int initCapacity) {
         heap = (T[]) new Comparable[initCapacity];
         capacity = initCapacity;
+        indexMap = new HashMap<>();
     }
     
     /****************************************
@@ -33,6 +38,7 @@ public class PriorityQueue<T extends Comparable<? super T>> {
     public void insert(T newElement) {
         if (size == capacity) // heap is full
             increaseCapacity();
+        indexMap.put(newElement, null);
         heapifyUp(size, newElement);
         size++;
     }
@@ -46,11 +52,17 @@ public class PriorityQueue<T extends Comparable<? super T>> {
         if (deleteIndex < 0 || deleteIndex > size-1)
             System.out.println("index out of bounds");
         else {
+            T elementToDelete = heap[deleteIndex];
+            indexMap.remove(elementToDelete);
             T freeElement = heap[--size]; 
             heap[size] = null;
-            if (deleteIndex != size)
+            if (deleteIndex < size)
                 heapifyDown(deleteIndex, freeElement);
         }
+    }
+    
+    public void delete(T elementToDelete) {
+        delete(indexMap.get(elementToDelete));
     }
     
     public T extractMin() {
@@ -72,6 +84,10 @@ public class PriorityQueue<T extends Comparable<? super T>> {
     public void heapify() {
         for (int i = size/2 - 1; i >= 0; i--)
             heapifyDown(i, heap[i]);
+    }
+    
+    public boolean isEmpty() {
+        return size == 0;
     }
     
     public void print() {
@@ -97,9 +113,11 @@ public class PriorityQueue<T extends Comparable<? super T>> {
             if (key.compareTo(parent) >= 0)
                 break; 
             heap[index] = parent;
+            indexMap.put(parent, index);
             index = parentIndex;
         }
         heap[index] = key;
+        indexMap.put(key, index);
     }
     
     // utility method to restore heap invariant after a deletion at index
@@ -116,9 +134,11 @@ public class PriorityQueue<T extends Comparable<? super T>> {
             if (key.compareTo(child) <= 0)
                 break;
             heap[index] = child;
+            indexMap.put(child, index);
             index = childIndex;
         }
         heap[index] = key;
+        indexMap.put(key, index);
     }
 
     private void increaseCapacity() {
@@ -163,12 +183,23 @@ public class PriorityQueue<T extends Comparable<? super T>> {
         System.out.println("min is: " + q.findMin());
         System.out.println("size is: " + q.size());
         System.out.println("capacity is: " + q.capacity());
-        System.out.println("extract min: " + q.extractMin());
         q.print();
-        System.out.println("extract min: " + q.extractMin());
-        q.print();
-        System.out.println("delete element at 7: ");
+        System.out.println("delete leaf... ");
         q.delete(7);
         q.print();
+        System.out.println("extract min: " + q.extractMin());
+        q.print();
+        System.out.println("extract min: " + q.extractMin());
+        q.print();
+        System.out.println("delete 12: ");
+        q.delete((Integer) 12);
+        q.print();
+        System.out.println("delete 7: ");
+        q.delete((Integer) 7);
+        q.print();
+        System.out.println("delete 5: ");
+        q.delete((Integer) 5);
+        q.print();
+        System.out.println(q.indexMap.toString());
     }
 }
