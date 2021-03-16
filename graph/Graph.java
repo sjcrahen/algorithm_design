@@ -89,9 +89,10 @@ public class Graph<T extends Comparable<? super T>> {
             Iterator<T> endVertices = u.edges.keySet().iterator();
             while (endVertices.hasNext()) {
                 v = graph.get(endVertices.next());
-                if (!S.contains(v) && u.cost + u.edges.get(v.label) < v.cost) {
+                double newCost = u.cost + u.edges.get(v.label);
+                if (!S.contains(v) && newCost < v.cost) {
                     pq.remove(v);
-                    v.cost = u.cost + u.edges.get(v.label);
+                    v.cost = newCost;
                     v.parent = u;
                     pq.add(v);
                 }
